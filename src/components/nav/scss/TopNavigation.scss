@@ -1,0 +1,29 @@
+@import "scss/config/common";
+@import "scss/functions/breakpoints";
+
+.top-navigation {
+
+    .k3000-logo {
+        max-width: 4.5rem;
+        fill: white;
+        margin-top: 0.5rem;
+    }
+
+    .ant-menu {
+        > .ant-menu-item {
+            @include breakpoint(medium down) {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                .anticon {
+                    margin-right: 0;
+                }
+            }
+        }
+
+        .user-menu {
+            .ant-menu-submenu-title {
+                padding-right: 0;
+            }
+        }
+    }
+}

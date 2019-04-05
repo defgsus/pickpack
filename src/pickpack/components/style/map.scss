@@ -1,0 +1,52 @@
+@import "scss/grid";
+
+
+.game-map-outer {
+
+  .game-map-inner {
+    height: 0;
+    width: 100%;
+    padding: 0 0 100% 0;
+    position: relative;
+
+    .game-map {
+
+      height: 100%;
+      width: 100%;
+      position: absolute;
+
+      .grid-x {
+        height: 100%;
+      }
+
+      .game-cell {
+        //border: 1px solid rgba(0,0,0,.1);
+
+        .path, &.path {
+          background: #eee;
+        }
+
+        &.game-type-wall {
+          background: url("../../assets/cell-wall.png");
+          background-size: 100%;
+        }
+
+        &.game-type-player {
+          background: #67dc9d;
+        }
+
+        &.game-type-chest {
+          background: url("../../assets/cell-chest.png");
+          background-size: 100%;
+        }
+
+        &.game-type-shelf {
+          background: url("../../assets/cell-shelf.png");
+          background-size: 100%;
+        }
+
+      }
+
+    }
+  }
+}

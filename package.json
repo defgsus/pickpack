@@ -1,0 +1,96 @@
+{
+  "name": "@k3000/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "config": {
+    "root": "./src",
+    "components": "./src/components",
+    "dist": "./dist"
+  },
+  "scripts": {
+    "build": "webpack -p --devtool sourcemap",
+    "start": "webpack-dev-server -d --history-api-fallback --inline --hot --colors --port 9010 --env.development",
+    "makemessages": "./node_modules/i18next-parser/bin/cli.js ./src --ignore-variables --directoryFilter '!node_modules'  -r -o ./src/i18n -n app -l en,de"
+  },
+  "babel": {
+    "presets": [
+      "@babel/env",
+      "@babel/react"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties",
+      [
+        "import",
+        {
+          "libraryName": "antd",
+          "libraryDirectory": "es",
+          "style": true
+        }
+      ],
+      [
+        "import",
+        {
+          "libraryName": "ant-design-pro",
+          "libraryDirectory": "lib",
+          "style": true,
+          "camel2DashComponentName": false
+        },
+        "unique-name"
+      ]
+    ]
+  },
+  "dependencies": {
+    "apexcharts": "^3.0.0",
+    "connected-react-router": "^6.0.0",
+    "foundation-sites": "^6.5.1",
+    "history": "^4.7.2",
+    "i18next": "^14.0.1",
+    "i18next-browser-languagedetector": "^2.2.4",
+    "immutability-helper": "^3.0.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.23",
+    "net": "^1.0.2",
+    "prop-types": "^15.6.2",
+    "querystring": "^0.2.0",
+    "react": "16.6.3",
+    "react-apexcharts": "^1.2.1",
+    "react-dom": "16.6.3",
+    "react-i18next": "^9.0.2",
+    "react-json-tree": "^0.11.2",
+    "react-redux": "^6.0.0",
+    "react-resizable": "^1.7.5",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-import": "^1.11.0",
+    "babel-runtime": "^6.26.0",
+    "core-js": "2",
+    "css-loader": "^2.1.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "i18next-parser": "^0.13.0",
+    "i18next-resource-store-loader": "^0.1.2",
+    "less-loader": "^4.1.0",
+    "node-sass": "^4.11.0",
+    "sass-extract": "^2.1.0",
+    "sass-extract-loader": "^1.1.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "svg-react-loader": "^0.4.6",
+    "url-loader": "^1.1.2",
+    "webpack": "3.12.0",
+    "webpack-dev-server": "2.11.3"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}

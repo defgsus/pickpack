@@ -1,0 +1,100 @@
+@import "scss/config/common.scss";
+
+
+.k3-table {
+    .table-control-panel {
+        padding: 1rem 0;
+
+        .table-settings {
+            padding-bottom: 0.5rem;
+        }
+
+        .ant-pagination .ant-pagination-options-size-changer.ant-select {
+            margin-right: 0;
+        }
+    }
+
+    .page-title {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stripedRow{
+        background-color: #fafafa;
+    }
+
+    .filter-icon {
+        svg {
+            fill: $k3-color-trans-gray;
+            &:hover {
+                fill: $k3-color-trans-gray2;
+            }
+        }
+    }
+
+    table {
+
+        .ant-input-clear-icon {
+
+            svg {
+                fill: $k3-color-trans-gray;
+                &:hover {
+                    fill: $k3-color-trans-gray2;
+                }
+            }
+
+        }
+
+        thead {
+            tr {
+                th {
+                    padding: .4rem;
+
+                    &.title {
+                        white-space: nowrap;
+                    }
+
+                    &.sortable {
+                        cursor: pointer;
+
+                        &.sorted {
+                            background-color: #e6f7ff;
+                        }
+
+                        div {
+                            display: flex;
+
+                            .title {
+                                flex-grow: 1;
+                            }
+
+                            .sorter {
+                                flex-grow: 0;
+                                padding-left: 1rem;
+                                color: $k3-color-medium-gray;
+
+                                i {
+                                    &:hover {
+                                        color: black;
+                                    }
+                                }
+
+                                .active {
+                                    color: $primary-color
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        tbody {
+            tr {
+                td {
+                    padding: .4rem;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+}

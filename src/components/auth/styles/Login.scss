@@ -1,0 +1,21 @@
+.ant-form.login-form {
+    max-width: calc(100% - 1.25rem);
+    width: 20rem;
+    margin: auto;
+    margin-top: 10vh;
+    border: 1px solid #e8e8e8;
+    padding: 1.5rem;
+}
+
+.login-language-switcher {
+    padding-top: 1rem;
+    white-space: nowrap;
+    form .ant-select {
+        width: auto;
+    }
+}
+
+
+.login-language-label {
+    margin-right: 0.5rem;
+}

@@ -1,0 +1,25 @@
+.k3-srd-diagram {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+
+    & .srd-default-link path {
+        stroke: #a3a3a3;
+    }
+
+    & .srd-default-label {
+        color: black;
+        background: #4f4f4f0f;
+        border: none;
+        padding: 0.1rem;
+    }
+
+    & .srd-default-node__name {
+        font-size: 1.03rem;
+    }
+
+    & .srd-node--selected {
+        box-shadow: 0 0 1rem 0.5rem #67dc9d;
+    }
+}
+

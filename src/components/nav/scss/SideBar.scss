@@ -1,0 +1,28 @@
+@import "scss/config/common";
+@import "scss/functions/breakpoints";
+
+.main-nav-sidebar {
+    background-color: #e8e8e8;
+    @include breakpoint(medium down)
+    {
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+    }
+}
+
+.sidebar-overlay {
+    z-index: 500;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255,255,255,0.5);
+    height: 100%;
+    @include breakpoint(large up)
+    {
+        display: none!important;
+    }
+}
