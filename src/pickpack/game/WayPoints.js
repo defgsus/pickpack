@@ -1,4 +1,8 @@
 
+export function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 
 export default class WayPoints {
 
@@ -7,6 +11,14 @@ export default class WayPoints {
         this._edge_fwd = {};
         this._edge_back = {};
     }
+
+    copy = () => {
+        const wp = new WayPoints();
+        wp._ids = deepCopy(this._ids);
+        wp._edge_fwd = deepCopy(this._edge_fwd);
+        wp._edge_back = deepCopy(this._edge_back);
+        return wp;
+    };
 
     hasEdge = (id1, id2) => {
         if (this._edge_fwd[id1])
@@ -88,10 +100,10 @@ export default class WayPoints {
         return closestId;
     };
 
-    getMapWaypoints = (map) => {
+    getMapWaypoints_FLOODFILL = (map) => {
 
-        let startPos = [2, 2];
-        while (map.rows[startPos[1]][startPos[0]].type !== "empty") {
+        let startPos = null;
+        while (!startPos || map.rows[startPos[1]][startPos[0]].type !== "empty") {
             startPos = [
                 parseInt(Math.random() * map.width) % map.width,
                 parseInt(Math.random() * map.height) % map.height,
@@ -130,6 +142,34 @@ export default class WayPoints {
             _check(curPos[0], curPos[1]-1);
 
             visited.add(cur);
+        }
+    };
+
+    getMapWaypoints = (map) => {
+
+        const addEdgePos = this.addEdgePos;
+        const posToId = this.posToId;
+
+        for (let y=0; y<map.height-1; ++y) {
+            for (let x=0; x<map.width-1; ++x) {
+
+                const field = map.rows[y][x];
+                if (!(field.type === "empty" || field.type === "player" || field.movable))
+                    continue;
+
+                const curPos = [x, y];
+
+                const _check = function (x, y) {
+                    if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
+                        const field = map.rows[y][x];
+                        if (field.type === "empty" || field.type === "player" || field.movable)
+                            addEdgePos(curPos, [x, y]);
+                    }
+                };
+
+                _check(curPos[0] + 1, curPos[1]);
+                _check(curPos[0], curPos[1] + 1);
+            }
         }
     };
 

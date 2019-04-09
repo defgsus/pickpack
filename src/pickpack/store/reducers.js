@@ -4,8 +4,8 @@ import ACTIONS from "./actions"
 
 import Map from "../game/Map"
 import WayPoints from "../game/WayPoints"
+import { createLevelOneState } from "../game/level1"
 import {
-    createNewGameState,
     gameAiStep,
     processEvents
 } from "../game/game"
@@ -32,7 +32,7 @@ const pickpackReducer = (state=DEFAULT_STATE, action) => {
         case ACTIONS.START_GAME: {
             return {
                 ...state,
-                ...createNewGameState(),
+                ...createLevelOneState(),
                 playing: true,
             };
         }

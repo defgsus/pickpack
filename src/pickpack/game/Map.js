@@ -2,6 +2,11 @@ import WayPoints from "./WayPoints"
 import AStar from "./AStar"
 
 
+export function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+
 export default class Map {
     constructor(state) {
         this.map = {
@@ -15,6 +20,7 @@ export default class Map {
         this._astar = null;
     }
 
+    /** Return object with state for the store */
     nextState = () => ({
         map: this.map,
         players: this.players,
@@ -22,6 +28,17 @@ export default class Map {
         uiEvents: this.uiEvents,
     });
 
+    /** Deepcopy */
+    copy = () => {
+        const m = new Map({
+            map: deepCopy(this.map),
+            players: deepCopy(this.players),
+            events: deepCopy(this.events),
+            uiEvents: deepCopy(this.uiEvents),
+        });
+        m._waypoints = this.waypoints();
+        return m;
+    };
 
     waypoints = () => {
         if (!this._waypoints) {
@@ -107,6 +124,7 @@ export default class Map {
         if (this.inRange(newX, newY)) {
             if (newField.type === "empty") {
                 this.moveField(oldX, oldY, newX, newY);
+                return true;
             }
 
             // push movables around
@@ -124,6 +142,7 @@ export default class Map {
                         for (let i = movables.length - 1; i > 0; --i) {
                             this.moveField(movables[i - 1][0], movables[i - 1][1], movables[i][0], movables[i][1]);
                         }
+                        return true;
                     }
                 }
             }
@@ -137,5 +156,6 @@ export default class Map {
                 })
             }
         }
+        return false;
     };
 }

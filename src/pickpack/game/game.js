@@ -2,80 +2,6 @@ import WayPoints from "./WayPoints"
 import AStar from "./AStar"
 
 
-const
-    _ = {"type": "empty"},
-    W = {"type": "wall"},
-    C = {"type": "chest", "movable": true},
-    S = {"type": "shelf", "shelfName": "A1"};
-
-
-const DEFAULT_MAP = {
-    width: 14,
-    height: 11,
-    rows: [
-        [W, W, W, W, W, W, W, W, W, W, W, W, W, W],
-        [W, _, _, _, _, _, _, _, C, _, _, _, _, W],
-        [W, _, _, _, _, _, _, _, _, _, _, _, _, W],
-        [W, _, C, _, S, S, S, S, S, _, C, S, _, W],
-        [W, _, _, _, _, _, C, _, _, _, C, S, _, W],
-        [W, _, C, C, S, S, S, S, S, _, _, S, _, W],
-        [W, _, _, _, _, _, _, _, _, C, _, S, _, W],
-        [W, _, _, _, _, C, _, _, _, _, _, S, _, W],
-        [W, _, _, _, _, _, _, _, _, _, _, C, _, W],
-        [W, _, _, _, _, _, _, _, _, _, _, _, _, W],
-        [W, W, W, W, W, W, W, W, W, W, W, W, W, W],
-    ]
-};
-
-
-const DEFAULT_PLAYERS = {
-    "Pick": {
-        "position": [1, 1],
-    },
-    "Pack": {
-        "position": [12, 7],
-        "task": {
-            type: "goto",
-            playerName: "Pick",
-        }
-    },
-    "Puck": {
-        "position": [7, 5],
-        "task": {
-            type: "goto",
-            playerName: "Pack",
-        }
-    },
-};
-
-
-export function deepCopy(obj) {
-    return JSON.parse(JSON.stringify(obj));
-}
-
-
-function createNewGameState() {
-    const map = deepCopy(DEFAULT_MAP);
-    const players = deepCopy(DEFAULT_PLAYERS);
-
-    for (const playerName in players) {
-        const player = players[playerName];
-        map.rows[player.position[1]][player.position[0]] = {
-            type: "player",
-            playerName: playerName,
-        }
-    }
-
-    return {
-        map,
-        players,
-        playerName: "Pick",
-        events: [],
-        uiEvents: [],
-    }
-}
-
-
 /**
  * Perform game logic
  * @param map instance of Map(map, players)
@@ -117,48 +43,154 @@ function processEvents(map) {
 
 
 function _gotoGoal(map, playerName, goalNode) {
+
+    const _log = function() { console.log("GOTO", `(${playerName})`, ...arguments); };
+
     const player = map.players[playerName];
+    const curPosId = map.waypoints().posToId(player.position);
+
+    if (curPosId === goalNode) {
+        if (player.path) {
+            _log("goal reached, clear path");
+            map.updatePlayer(playerName, {path: null});
+        }
+        return true;
+    }
+
+    const startNode = map.waypoints().getClosestNode(player.position);
+    if (startNode !== curPosId) {
+        _log("CANT FIND startNode", player.position, startNode, map.waypoints()._ids);
+        return false;
+    }
+    //console.log("PLAYER pos", player.position, "closest-node", startNode);
+    //console.log("WAYPOINTS", map.waypoints()._ids);
+
+    let path = map.astar().search(startNode, goalNode);
+    if (path && path.length < 2)
+        path = null;
+    _log("search", curPosId, startNode, goalNode, path);
+    map.updatePlayer(playerName, {path});
+    if (path) {
+        const nextPos = map.waypoints().idToPos(path[1]);
+        map.performMove(
+            playerName,
+            Math.max(-1,Math.min(1, nextPos[0] - player.position[0] )),
+            Math.max(-1,Math.min(1, nextPos[1] - player.position[1] ))
+        );
+        const nextPosId = map.waypoints().posToId(map.players[playerName]);
+        return nextPosId === goalNode;
+    }
+    return false;
+}
+
+
+
+function _gotoGoalREUSE(map, playerName, goalNode) {
+
+    const _log = function() { console.log("GOTO", `(${playerName})`, ...arguments); };
+
+    const player = map.players[playerName];
+    const curPosId = map.waypoints().posToId(player.position);
+
+    if (curPosId === goalNode) {
+        if (player.path) {
+            _log("goal reached, clear path");
+            map.updatePlayer(playerName, {path: null});
+        }
+        return true;
+    }
 
     const startNode = map.waypoints().getClosestNode(player.position);
     //console.log("PLAYER pos", player.position, "closest-node", startNode);
     //console.log("WAYPOINTS", map.waypoints()._ids);
 
+    let pathValid = false;
     let nextPos = null;
-    if (!player.path || player.path[player.path.length-1] !== goalNode) {
-        const path = map.astar().search(startNode, goalNode);
-        map.updatePlayer(playerName, {
-            path: path,
-        });
-        if (path)
-            nextPos = map.waypoints().idToPos(path[0]);
+
+    // has a current path?
+    if (player.path && player.path.length) {
+        const pathIndex = player.path.indexOf(curPosId);
+
+        // we are on current path ?
+        if (pathIndex >= 0 && pathIndex < player.path.length-1) {
+            pathValid = true;
+
+            // see if still points to goal
+            if (player.path[player.path.length-1] !== goalNode) {
+                pathValid = false;
+                _log("goalnode changed")
+            }
+
+            if (pathValid) {
+                // see if path is still free
+                for (let i = pathIndex; i < player.path.length - 1; ++i) {
+                    const pathPos = map.waypoints().idToPos(player.path[i]);
+                    const field = map.field(pathPos[0], pathPos[1]);
+                    if (!(curPosId === player.path[i] || (field.movable && _canFollowPath(map, playerName)))) {
+                        _log("path blocked ", i, player.path[i], "by", field);
+                        pathValid = false;
+                        break;
+                    }
+                }
+            }
+
+            if (pathValid) {
+                nextPos = map.waypoints().idToPos(player.path[pathIndex + 1]);
+                _log("next step", nextPos);
+            }
+        }
     }
 
-    if (player.path && player.path.length) {
-        const curPosId = map.waypoints().posToId(player.position);
-        const pathIndex = player.path.indexOf(curPosId);
-        if (pathIndex >= 0 && pathIndex < player.path.length-1) {
-            nextPos = map.waypoints().idToPos(player.path[pathIndex+1]);
-        }
-        else {
-            const path = map.astar().search(startNode, goalNode);
-            map.updatePlayer(playerName, {path: path});
-            if (path)
-                nextPos = map.waypoints().idToPos(path[0]);
-        }
+    if (!pathValid) {
+        let path = map.astar().search(startNode, goalNode);
+        if (path && path.length < 2)
+            path = null;
+        _log("new path from", startNode, "to", goalNode, "->", path);
+        map.updatePlayer(playerName, {path: path});
+        if (path)
+            nextPos = map.waypoints().idToPos(path[1]);
     }
 
     if (nextPos) {
         map.performMove(
             playerName,
-            nextPos[0] - player.position[0],
-            nextPos[1] - player.position[1]
+            Math.max(-1,Math.min(1, nextPos[0] - player.position[0] )),
+            Math.max(-1,Math.min(1, nextPos[1] - player.position[1] ))
         );
     }
+
+    const nextPosId = map.waypoints().posToId(map.players[playerName]);
+    if (nextPosId === goalNode) {
+        _log("goal reached, clear path");
+        map.updatePlayer(playerName, {path: null});
+        return true;
+    }
+    return false;
+}
+
+
+function _canFollowPath(map, playerName) {
+    map = map.copy();
+    const player = map.players[playerName];
+    let curPosId = map.waypoints().posToId(player.position);
+    let pathIndex = player.path.indexOf(curPosId);
+    if (pathIndex < 0)
+        return false;
+    while (pathIndex < player.path.length-2) {
+        const
+            nextPosId = player.path[pathIndex+1],
+            pos1 = map.waypoints().idToPos(curPosId),
+            pos2 = map.waypoints().idToPos(nextPosId);
+        if (!map.performMove(playerName, pos2[0]-pos1[0], pos2[1]-pos1[1]))
+            return false;
+        pathIndex += 1;
+        curPosId = nextPosId;
+    }
+    return true;
 }
 
 
 export {
-    createNewGameState,
     gameAiStep,
     processEvents,
 }

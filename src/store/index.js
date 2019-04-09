@@ -16,7 +16,7 @@ const store = createStore(
     composeEnhancers(
         applyMiddleware(
             routerMiddleware(history),
-            logger
+            //logger
         )
     ));
 
