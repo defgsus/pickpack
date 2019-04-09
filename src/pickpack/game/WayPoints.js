@@ -100,51 +100,6 @@ export default class WayPoints {
         return closestId;
     };
 
-    getMapWaypoints_FLOODFILL = (map) => {
-
-        let startPos = null;
-        while (!startPos || map.rows[startPos[1]][startPos[0]].type !== "empty") {
-            startPos = [
-                parseInt(Math.random() * map.width) % map.width,
-                parseInt(Math.random() * map.height) % map.height,
-            ]
-        }
-
-        const visited = new Set();
-        const visit = new Set([this.posToId(startPos)]);
-        const addEdgePos = this.addEdgePos;
-        const posToId = this.posToId;
-
-        while (visit.size) {
-            const cur = visit.entries().next().value[0];
-            visit.delete(cur);
-            const curPos = this.idToPos(cur);
-
-            const _add = function(x, y) {
-                addEdgePos(curPos, [x, y]);
-                const newId = posToId([x, y]);
-                if (map.rows[y][x].type === "empty")
-                    if (!visited.has(newId))
-                        visit.add(newId);
-            };
-
-            const _check = function(x, y) {
-                if (x >= 0 && x < map.width && y >= 0 && y < map.height) {
-                    const field = map.rows[y][x];
-                    if (field.type === "empty" || field.type === "player" || field.movable)
-                        _add(x, y);
-                }
-            };
-
-            _check(curPos[0]-1, curPos[1]);
-            _check(curPos[0]+1, curPos[1]);
-            _check(curPos[0], curPos[1]+1);
-            _check(curPos[0], curPos[1]-1);
-
-            visited.add(cur);
-        }
-    };
-
     getMapWaypoints = (map) => {
 
         const addEdgePos = this.addEdgePos;
