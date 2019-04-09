@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "webpack -p --devtool sourcemap",
-    "start": "webpack-dev-server -d --history-api-fallback --inline --hot --colors --port 9010 --env.development",
+    "start": "webpack-dev-server -d --history-api-fallback --inline --hot --colors --port 9999 --env.development",
     "makemessages": "./node_modules/i18next-parser/bin/cli.js ./src --ignore-variables --directoryFilter '!node_modules'  -r -o ./src/i18n -n app -l en,de"
   },
   "babel": {
